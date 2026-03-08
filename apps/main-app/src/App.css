@@ -141,6 +141,7 @@
 
 .button-row {
   justify-content: flex-start;
+  flex-wrap: wrap;
 }
 
 .primary-button,

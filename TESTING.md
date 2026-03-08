@@ -7,11 +7,12 @@ Current repository status on March 8, 2026:
 - the repository now contains application code under `apps/main-app/` and Rust workspace crates under `crates/`
 - app-local Vitest coverage exists for unit, integration, and shell smoke flows
 - metadata reference files have been promoted into `tests/fixtures/metadata/`
-- CI workflows do not exist yet
+- a cross-platform bootstrap validation workflow now exists at `.github/workflows/bootstrap-validation.yml`
 - the repository now includes `examples/XMP Side Car.XMP` as a seed XMP sidecar reference file
 - the repository now also includes `examples/IPTC_Fields.XMP` as a broad XMP sidecar reference for IPTC field-map coverage
 - the repository now also includes `examples/IPTC-PhotometadataRef-Std2025.1.jpg` as a broad IPTC JPEG reference fixture
 - `npm run test:e2e` currently exercises a Vitest-based renderer smoke flow until Playwright-based desktop E2E automation is implemented
+- `npm run test:tauri-launch` now provides a deterministic desktop-process launch smoke check for the shell bootstrap milestone
 
 ## Testing policy
 
@@ -116,6 +117,17 @@ Rules:
 - Linux, macOS, and Windows must all be exercised in CI or release validation
 - platform-specific failures are release-blocking for the affected platform
 
+### 7. Desktop launch smoke
+
+Use for:
+
+- Phase 2 shell verification that the Tauri desktop process starts successfully
+
+Rules:
+
+- `npm run test:tauri-launch` must detect the backend startup marker and terminate cleanly
+- Linux CI runs should execute launch smoke under `xvfb-run`
+
 ## Fixtures and test data
 
 The target fixture layout is:
@@ -187,6 +199,7 @@ npm run typecheck
 npm run test
 npm run test:integration
 npm run test:e2e
+npm run test:tauri-launch
 npm run build
 
 cargo fmt --all --check
@@ -200,6 +213,7 @@ Optional accelerators:
 ```bash
 cargo nextest run
 npm --workspace <workspace> run test
+npm run verify:local
 ```
 
 ## CI expectations

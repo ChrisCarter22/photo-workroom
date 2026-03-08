@@ -58,6 +58,17 @@ Agents must prefer:
 - approved existing dependencies over adding packages
 - narrow, well-tested changes over speculative rewrites
 
+## Git permissions
+
+Agents have permission to run Git commit and push operations to GitHub for task-related work.
+
+Rules:
+
+- commit and push only task-relevant changes
+- run required verification before pushing
+- do not hide failing checks when committing or pushing
+- follow repository branch and PR policy documented in `CONTRIBUTING.md`
+
 ## Hard rules
 
 Agents must not:

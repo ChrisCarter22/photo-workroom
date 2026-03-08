@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 import { requestHealthCheck, type HealthCheckResponse } from './lib/health';
 import {
@@ -8,6 +8,8 @@ import {
   resetShellState,
   type ShellState,
 } from './lib/shellState';
+import { isTauriRuntime } from './lib/tauri';
+import { consumeWindowFolderOpenRequest, openFolderInSeparateWindow } from './lib/windowing';
 
 function App() {
   const [shellState, setShellState] = useState<ShellState>(() => createInitialShellState());
@@ -15,8 +17,41 @@ function App() {
   const [healthResult, setHealthResult] = useState<HealthCheckResponse | null>(null);
   const [healthState, setHealthState] = useState<'idle' | 'loading' | 'error'>('idle');
   const [healthError, setHealthError] = useState<string | null>(null);
+  const [windowOpenState, setWindowOpenState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [windowOpenMessage, setWindowOpenMessage] = useState<string | null>(null);
 
   const activeTab = getActiveTab(shellState);
+
+  useEffect(() => {
+    if (!isTauriRuntime()) {
+      return;
+    }
+
+    let canceled = false;
+    void consumeWindowFolderOpenRequest()
+      .then((response) => {
+        const startupFolderPath = response.folderPath;
+        if (canceled || startupFolderPath === null) {
+          return;
+        }
+
+        setShellState((current) => openFolderInShell(current, startupFolderPath));
+      })
+      .catch((error) => {
+        if (canceled) {
+          return;
+        }
+
+        setWindowOpenState('error');
+        setWindowOpenMessage(
+          error instanceof Error ? error.message : 'Failed to read startup folder for this window.',
+        );
+      });
+
+    return () => {
+      canceled = true;
+    };
+  }, []);
 
   async function runHealthCheck() {
     setHealthState('loading');
@@ -34,6 +69,39 @@ function App() {
       setHealthResult(null);
       setHealthState('error');
       setHealthError(error instanceof Error ? error.message : 'Health check failed.');
+    }
+  }
+
+  async function openFolderInNewWindow() {
+    const trimmedPath = folderPath.trim();
+
+    if (!trimmedPath) {
+      setWindowOpenState('error');
+      setWindowOpenMessage('Enter a folder path before opening a separate window.');
+      return;
+    }
+
+    if (!isTauriRuntime()) {
+      setWindowOpenState('error');
+      setWindowOpenMessage('Separate windows require the desktop runtime (`npm run tauri:dev`).');
+      return;
+    }
+
+    setWindowOpenState('loading');
+    setWindowOpenMessage(null);
+
+    try {
+      const response = await openFolderInSeparateWindow({
+        requestId: `window-open-${Date.now()}`,
+        folderPath: trimmedPath,
+        activeWorkspace: activeTab.title,
+      });
+
+      setWindowOpenState('success');
+      setWindowOpenMessage(`${response.message} (${response.windowLabel})`);
+    } catch (error) {
+      setWindowOpenState('error');
+      setWindowOpenMessage(error instanceof Error ? error.message : 'Failed to open a separate window.');
     }
   }
 
@@ -85,15 +153,24 @@ function App() {
             />
           </label>
           <div className="button-row">
-            <button className="primary-button" onClick={() => setShellState((current) => openFolderInShell(current, folderPath))}>
+            <button
+              className="primary-button"
+              onClick={() => setShellState((current) => openFolderInShell(current, folderPath))}
+            >
               Open Folder Tab
+            </button>
+            <button className="secondary-button" onClick={() => void openFolderInNewWindow()}>
+              Open Folder in New Window
             </button>
             <button className="secondary-button" onClick={() => setShellState(resetShellState())}>
               Reset Shell
             </button>
           </div>
-          <p className="caption">
-            The first folder replaces the blank Untitled workspace. Later folders open as new tabs.
+          <p className={windowOpenState === 'error' ? 'caption error-text' : 'caption'}>
+            {windowOpenState === 'loading'
+              ? 'Opening a separate workspace window...'
+              : windowOpenMessage ??
+                'The first folder replaces the blank Untitled workspace. Later folders open as new tabs, or explicitly in a separate window.'}
           </p>
         </section>
 
@@ -105,9 +182,7 @@ function App() {
           <button className="primary-button" onClick={() => void runHealthCheck()}>
             Run Backend Health Check
           </button>
-          <p className="caption">
-            Separate-window folder opening remains planned for a later shell milestone.
-          </p>
+          <p className="caption">Use the Navigator action to open a folder in a dedicated window.</p>
         </section>
       </aside>
 

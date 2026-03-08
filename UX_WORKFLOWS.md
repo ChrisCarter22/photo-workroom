@@ -5,7 +5,7 @@ This document describes the target user workflows for Photo Workroom.
 Current repository status on March 8, 2026:
 
 - a shell baseline now exists with a dark workspace-first layout, sidebar panels, tab strip, status bar, and a typed backend health-check action
-- separate-window folder opening, thumbnail browsing, preview, metadata editing, and ingest workflows remain planned
+- explicit separate-window folder opening now exists in the shell baseline; thumbnail browsing, preview, metadata editing, and ingest workflows remain planned
 - the workflows below describe the product behavior the UI should eventually support
 
 ## Workflow principles

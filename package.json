@@ -19,8 +19,9 @@
     "test": "npm --workspace apps/main-app run test",
     "test:integration": "npm --workspace apps/main-app run test:integration",
     "test:e2e": "npm --workspace apps/main-app run test:e2e",
+    "test:tauri-launch": "node scripts/tauri-launch-smoke.mjs",
     "build": "npm --workspace apps/main-app run build",
+    "verify:local": "npm run lint && npm run typecheck && npm run test && npm run test:integration && npm run test:e2e && npm run build && cargo fmt --all --check && cargo clippy --workspace --all-targets --all-features -- -D warnings && cargo test --workspace && cargo build --workspace",
     "tauri:build": "npm --workspace apps/main-app run tauri:build"
   }
 }
-

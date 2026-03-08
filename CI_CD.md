@@ -5,7 +5,9 @@ This document defines the target CI and release process for Photo Workroom.
 Current repository status on March 8, 2026:
 
 - `.github/` now exists with issue and PR templates
-- no workflows or release automation have been implemented
+- `.github/workflows/bootstrap-validation.yml` now exists and runs bootstrap plus desktop-launch verification on Ubuntu, macOS, and Windows
+- release automation has not been implemented
+- the current workflow is a narrow bootstrap gate, not the full Phase 16 split-job target
 - the content below defines the baseline that Phase 16 should deliver
 
 ## Goals

@@ -5,7 +5,7 @@ This document defines how contributors should work in the Photo Workroom reposit
 Current repository status on March 8, 2026:
 
 - the repository now contains a real workspace scaffold and a desktop shell baseline
-- CI workflows are still absent, so local verification is currently authoritative
+- `.github/workflows/bootstrap-validation.yml` now runs baseline verification in an OS matrix
 
 ## Before contributing
 
@@ -77,6 +77,12 @@ Suggested bootstrap flow:
 
 ```bash
 npm ci
+npm run verify:local
+```
+
+Manual equivalent (same checks in explicit order):
+
+```bash
 npm run lint
 npm run typecheck
 npm run test
@@ -96,6 +102,22 @@ To run the desktop shell locally:
 npm run tauri:dev
 ```
 
+To run the deterministic desktop launch smoke check:
+
+```bash
+npm run test:tauri-launch
+```
+
+Runtime note:
+
+- `npm run dev` is renderer-only and does not provide Tauri desktop APIs
+- use `npm run tauri:dev` when validating typed IPC commands or window-management behavior
+- use `npm run test:tauri-launch` to assert that the desktop shell process starts and emits the startup marker
+
+Environment note:
+
+- no repository-level `.env` file is required for the current Phase 0 through Phase 2 baseline
+
 ## Editor recommendations
 
 Recommended baseline:
@@ -110,6 +132,7 @@ Recommended baseline:
 Common setup issues:
 
 - if `npm ci` fails, confirm you are using the supported Node and npm versions
+- if local verification is inconsistent, run `npm ci` and then `npm run verify:local` from the repository root to enforce a deterministic check order
 - if Tauri fails to build on Linux, verify the WebKitGTK and appindicator packages are installed
 - if Tauri fails to build on macOS, install Xcode Command Line Tools with `xcode-select --install`
 - if Tauri fails to launch on Windows, install or repair Microsoft WebView2

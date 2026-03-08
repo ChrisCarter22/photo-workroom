@@ -5,7 +5,7 @@ This document describes the target architecture for Photo Workroom.
 Current repository status on March 8, 2026:
 
 - the repository now contains a real workspace scaffold with `apps/main-app/`, Rust crates under `crates/`, root manifests, and GitHub templates
-- the desktop shell baseline exists with a typed Tauri health-check command and a Photo Mechanic-style workspace layout stub
+- the desktop shell baseline exists with typed Tauri commands for health-check and explicit separate-window folder opening plus a Photo Mechanic-style workspace layout stub
 - most bounded contexts below remain target-state guidance beyond the current shell bootstrap
 
 ## System goals

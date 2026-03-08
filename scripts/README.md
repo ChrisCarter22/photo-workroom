@@ -1,6 +1,7 @@
 # scripts
 
-This directory is reserved for checked-in utility scripts that support development, verification, or release work.
+This directory contains checked-in utility scripts for deterministic local and CI verification.
 
-The current bootstrap does not require custom repository scripts yet because npm and Cargo entrypoints cover the initial workflow.
+Current scripts:
 
+- `tauri-launch-smoke.mjs`: launches `npm --workspace apps/main-app run tauri:dev -- --no-watch`, waits for the backend startup marker, then terminates the app process tree and reports pass or fail

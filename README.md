@@ -23,6 +23,12 @@ Install and verify:
 
 ```bash
 npm ci
+npm run verify:local
+```
+
+Manual equivalent (same checks in explicit order):
+
+```bash
 npm run lint
 npm run typecheck
 npm run test
@@ -42,12 +48,24 @@ Run the desktop shell locally:
 npm run tauri:dev
 ```
 
+Run the deterministic launch smoke check:
+
+```bash
+npm run test:tauri-launch
+```
+
+Troubleshooting notes:
+
+- `npm run dev` starts only the renderer and cannot exercise Tauri-only behavior such as backend IPC and separate-window actions
+- use `npm run tauri:dev` when verifying shell behavior that depends on desktop runtime features
+- no repository-level `.env` file is required for the current Phase 0 through Phase 2 baseline
+
 ## Repository map
 
 - `apps/main-app/`: desktop shell renderer and Tauri runtime
 - `crates/`: initial Rust subsystem boundaries
 - `tests/fixtures/metadata/`: promoted metadata reference fixtures
+- `tests/validation/BOOTSTRAP_VALIDATION.md`: platform bootstrap and launch verification evidence
 - `examples/`: manually reviewed reference files kept alongside the formal fixture copies
 - `PLANNING.md`: phase tracker and current implementation status
 - `CONTRIBUTING.md`: setup requirements, verification rules, and contributor workflow
-

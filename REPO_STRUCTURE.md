@@ -17,8 +17,9 @@ Present today:
 - `apps/main-app/` with renderer and Tauri shell code
 - `crates/` with initial Rust subsystem boundaries
 - `tests/fixtures/metadata/` with promoted reference fixtures
-- placeholder `packages/`, `benchmarks/`, and `scripts/` directories with checked-in README files
-- `.github/` issue and pull-request templates
+- placeholder `packages/` and `benchmarks/` directories with checked-in README files
+- `scripts/tauri-launch-smoke.mjs` for deterministic desktop launch verification
+- `.github/` issue and pull-request templates plus the bootstrap validation workflow
 
 Present supporting sample data today:
 
@@ -79,21 +80,26 @@ Present supporting sample data today:
 │  └─ README.md
 ├─ tests/
 │  ├─ README.md
-│  └─ fixtures/
-│     └─ metadata/
+│  ├─ fixtures/
+│  │  └─ metadata/
+│  └─ validation/
+│     └─ BOOTSTRAP_VALIDATION.md
 ├─ benchmarks/
 │  └─ README.md
 ├─ scripts/
-│  └─ README.md
+│  ├─ README.md
+│  └─ tauri-launch-smoke.mjs
 └─ .github/
    ├─ ISSUE_TEMPLATE/
+   ├─ workflows/
+   │  └─ bootstrap-validation.yml
    └─ PULL_REQUEST_TEMPLATE.md
 ```
 
 ## Workspace notes
 
 - `apps/main-app/src-tauri/icons/icon.png` is currently a placeholder application icon for the bootstrap milestone
-- app-local frontend tests live under `apps/main-app/src/` while root `tests/` currently holds shared fixtures
+- app-local frontend tests live under `apps/main-app/src/` while root `tests/` currently holds shared fixtures and validation evidence logs
 - generated runtime artifacts such as `node_modules/`, `target/`, `dist/`, and Tauri schema output are ignored and do not define the repository structure
 
 ## Root documentation files
@@ -168,6 +174,7 @@ Current structure:
 - `tests/fixtures/`
 - `tests/integration/`
 - `tests/e2e/`
+- `tests/validation/`
 
 Rules:
 

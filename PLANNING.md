@@ -5,7 +5,10 @@ This document is the execution tracker for Photo Workroom. It converts the resea
 Current repository status on March 8, 2026:
 
 - the repository now contains a real workspace scaffold with `apps/`, `crates/`, `tests/`, `benchmarks/`, `scripts/`, `packages/`, and `.github/`
-- the desktop shell baseline exists under `apps/main-app/` with a typed Tauri health-check flow
+- the desktop shell baseline exists under `apps/main-app/` with typed Tauri health-check and separate-window folder-open flows
+- a deterministic Tauri launch smoke command now exists at `npm run test:tauri-launch`
+- cross-platform bootstrap validation automation now exists at `.github/workflows/bootstrap-validation.yml`
+- bootstrap verification evidence is tracked in `tests/validation/BOOTSTRAP_VALIDATION.md`
 - metadata reference fixtures have been promoted into `tests/fixtures/metadata/`
 - the repository does contain `examples/XMP Side Car.XMP`, which should be treated as the first metadata sidecar reference input
 - the repository also contains `examples/IPTC_Fields.XMP`, which should be treated as the broad XMP-sidecar reference for IPTC property coverage
@@ -25,6 +28,12 @@ When updating this file:
 - do not mark a step complete if verification for that step is still failing
 - prefer splitting vague work into checkable items rather than leaving ambiguous bullets
 - if scope changes, update the phase notes and `DECISIONS.md`
+
+Out-of-order execution note on March 8, 2026:
+
+- a narrow subset of Phase 16 CI work was pulled forward to unblock unresolved Phase 1 and Phase 2 verification risk
+- reason: Phase 1 cross-platform bootstrap validation and Phase 2 launch-smoke verification need repeatable matrix automation
+- scope was kept to one bootstrap workflow and one launch-smoke helper without changing product architecture
 
 ## Product benchmark
 
@@ -53,8 +62,8 @@ Current exclusion:
 | Phase | Status | Summary |
 |---|---|---|
 | Phase 0: Repository bootstrap | `[x]` | Workspace scaffold, manifests, fixture promotion, scripts, and verification entrypoints now exist and verify cleanly |
-| Phase 1: Dev environment hardening | `[-]` | Toolchain docs, setup notes, and repo templates exist, but cross-platform bootstrap validation is still incomplete |
-| Phase 2: Shell app bootstrap | `[-]` | The shell app, typed IPC health check, and tabbed workspace baseline exist, but full app-launch and multi-window behavior are still incomplete |
+| Phase 1: Dev environment hardening | `[-]` | Toolchain docs, setup notes, templates, and bootstrap automation exist, with Linux and Windows evidence pending first CI matrix run |
+| Phase 2: Shell app bootstrap | `[x]` | The shell app now supports typed IPC health-check, explicit separate-window behavior, and deterministic local launch-smoke verification |
 | Phase 3: Local database and indexing foundation | `[ ]` | No schema, migrations, or DB layer exist yet |
 | Phase 4: Filesystem scanning foundation | `[ ]` | No scan pipeline exists yet |
 | Phase 5: Ingest MVP | `[ ]` | No ingest implementation exists yet |
@@ -68,7 +77,7 @@ Current exclusion:
 | Phase 13: Performance pass | `[ ]` | No benchmark harness exists yet |
 | Phase 14: Reliability pass | `[ ]` | No edge-case verification exists yet |
 | Phase 15: Documentation pass | `[-]` | Core docs exist and were expanded, but implementation-linked docs will need revision once code lands |
-| Phase 16: CI hardening | `[ ]` | No CI workflows or release automation exist yet |
+| Phase 16: CI hardening | `[-]` | A narrow bootstrap validation matrix workflow now exists; broader CI hardening and release automation remain pending |
 | Phase 17: Cross-platform validation | `[ ]` | No builds or validation runs exist yet |
 | Phase 18: Beta readiness | `[ ]` | Product validation not started |
 | Phase 19: Stable release readiness | `[ ]` | Release engineering not started |
@@ -176,27 +185,29 @@ Checklist:
   - `[x]` document supported Rust toolchain version
   - `[x]` document OS-specific system packages for Tauri
   - `[x]` document WebView requirements by platform
-- `[ ]` Contributor ergonomics
+- `[x]` Contributor ergonomics
   - `[x]` add setup instructions for Linux
   - `[x]` add setup instructions for macOS
   - `[x]` add setup instructions for Windows
   - `[x]` add editor recommendations and extensions
   - `[x]` add troubleshooting notes for common setup failures
-- `[ ]` Local validation
-  - `[ ]` verify `npm ci` installs on all supported platforms
+- `[-]` Local validation
+  - `[-]` verify `npm ci` installs on all supported platforms
   - `[x]` verify Rust format and lint flows
   - `[x]` verify frontend lint and typecheck flows
-  - `[ ]` verify clean bootstrap from an empty machine
-- `[ ]` Templates and guardrails
+  - `[x]` verify app launch smoke from a local machine with `npm run test:tauri-launch`
+  - `[-]` verify clean bootstrap from an empty machine
+  - `[x]` add cross-platform bootstrap workflow and evidence log
+- `[x]` Templates and guardrails
   - `[x]` add issue templates
   - `[x]` add PR template
-  - `[ ]` add environment examples if needed
+  - `[x]` document environment-example requirements for the current baseline
 
 Exit criteria:
 
 - a new contributor can follow the docs and get a green baseline setup on each target OS
 
-## Phase 2: Shell app bootstrap `[-]`
+## Phase 2: Shell app bootstrap `[x]`
 
 Goal:
 
@@ -204,12 +215,12 @@ Goal:
 
 Checklist:
 
-- `[ ]` App shell scaffold
+- `[x]` App shell scaffold
   - `[x]` create `apps/main-app/`
   - `[x]` initialize React + TypeScript + Vite frontend
   - `[x]` initialize Tauri v2 runtime
   - `[x]` commit base app config files
-- `[ ]` Minimal UI
+- `[x]` Minimal UI
   - `[x]` render a Photo Mechanic-style workspace shell instead of a generic landing page
   - `[x]` add left sidebar with search plus Favorites, Navigator, and Tasks sections
   - `[x]` add top tab strip for workspaces or contact sheets
@@ -217,17 +228,17 @@ Checklist:
   - `[x]` add bottom status bar for selection and task summaries
   - `[x]` make the initial `Untitled` workspace become the first opened folder tab
   - `[x]` open additional folders as new tabs by default
-  - `[ ]` support explicitly opening folders in separate windows
+  - `[x]` support explicitly opening folders in separate windows
   - `[x]` show application version or environment information
   - `[x]` provide a visible health-check interaction
-- `[ ]` IPC baseline
+- `[x]` IPC baseline
   - `[x]` create a simple backend command such as `ping`
   - `[x]` call the command from the UI
   - `[x]` validate typed payloads and responses
-- `[ ]` Verification
+- `[x]` Verification
   - `[x]` frontend build succeeds
   - `[x]` Rust build succeeds
-  - `[ ]` app launches locally
+  - `[x]` app launches locally
   - `[x]` smoke test validates the shell
 
 Exit criteria:
@@ -798,7 +809,7 @@ Exit criteria:
 
 - the documentation accurately reflects the repository and onboarding is complete
 
-## Phase 16: CI hardening `[ ]`
+## Phase 16: CI hardening `[-]`
 
 Goal:
 
@@ -806,17 +817,17 @@ Goal:
 
 Checklist:
 
-- `[ ]` Baseline workflows
-  - `[ ]` add lint workflow
-  - `[ ]` add test workflow
-  - `[ ]` add build workflow
+- `[-]` Baseline workflows
+  - `[x]` add lint workflow
+  - `[x]` add test workflow
+  - `[x]` add build workflow
   - `[ ]` add docs validation workflow if adopted
-- `[ ]` Matrix coverage
-  - `[ ]` add Ubuntu jobs
-  - `[ ]` add macOS jobs
-  - `[ ]` add Windows jobs
+- `[-]` Matrix coverage
+  - `[x]` add Ubuntu jobs
+  - `[x]` add macOS jobs
+  - `[x]` add Windows jobs
 - `[ ]` Performance and efficiency
-  - `[ ]` cache npm cache
+  - `[x]` cache npm cache
   - `[ ]` cache cargo registry
   - `[ ]` cache cargo target intelligently
   - `[ ]` split fast and slow jobs
