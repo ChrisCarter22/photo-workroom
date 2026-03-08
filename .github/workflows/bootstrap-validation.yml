@@ -35,6 +35,13 @@ jobs:
           toolchain: 1.93.1
           components: rustfmt, clippy
 
+      - name: Normalize Git line endings (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+          git reset --hard HEAD
+
       - name: Install Linux Tauri dependencies
         if: runner.os == 'Linux'
         run: |
