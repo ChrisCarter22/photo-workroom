@@ -1,0 +1,16 @@
+import { mergeConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
+import viteConfig from './vite.config';
+
+export default mergeConfig(
+  viteConfig,
+  defineConfig({
+    test: {
+      environment: 'jsdom',
+      setupFiles: './src/test/setup.ts',
+      include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+      exclude: ['src/**/*.integration.test.ts', 'src/**/*.integration.test.tsx', 'src/**/*.e2e.test.ts', 'src/**/*.e2e.test.tsx'],
+    },
+  }),
+);
+

@@ -1,0 +1,15 @@
+.DS_Store
+node_modules/
+dist/
+coverage/
+target/
+tmp/
+npm-debug.log*
+playwright-report/
+test-results/
+apps/main-app/src-tauri/gen/
+.tools/
+**/node_modules/
+**/dist/
+**/coverage/
+**/.DS_Store

@@ -1,0 +1,7 @@
+[package]
+name = "photo_workroom_db"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+photo_workroom_core = { path = "../core" }

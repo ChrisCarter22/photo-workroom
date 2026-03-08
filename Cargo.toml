@@ -1,0 +1,23 @@
+[workspace]
+members = [
+  "apps/main-app/src-tauri",
+  "crates/core",
+  "crates/db",
+  "crates/image",
+  "crates/ingest",
+  "crates/metadata",
+  "crates/task_runtime"
+]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+version = "0.1.0"
+
+[workspace.dependencies]
+serde = { version = "1.0.228", features = ["derive"] }
+tauri = { version = "2.10.3" }
+tauri-build = { version = "2.5.6" }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.22", features = ["fmt"] }
+

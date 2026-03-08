@@ -1,0 +1,22 @@
+[package]
+name = "photo-workroom-main-app"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+name = "photo_workroom_main_app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build.workspace = true
+
+[dependencies]
+photo_workroom_core = { path = "../../../crates/core" }
+photo_workroom_db = { path = "../../../crates/db" }
+photo_workroom_image = { path = "../../../crates/image" }
+photo_workroom_ingest = { path = "../../../crates/ingest" }
+photo_workroom_metadata = { path = "../../../crates/metadata" }
+photo_workroom_task_runtime = { path = "../../../crates/task_runtime" }
+tauri.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true

@@ -1,0 +1,26 @@
+{
+  "name": "photo-workroom",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "npm@10.9.4",
+  "workspaces": [
+    "apps/main-app"
+  ],
+  "engines": {
+    "node": ">=20.20.0",
+    "npm": ">=10.9.4"
+  },
+  "scripts": {
+    "dev": "npm --workspace apps/main-app run dev",
+    "tauri:dev": "npm --workspace apps/main-app run tauri:dev",
+    "lint": "npm --workspace apps/main-app run lint",
+    "typecheck": "npm --workspace apps/main-app run typecheck",
+    "test": "npm --workspace apps/main-app run test",
+    "test:integration": "npm --workspace apps/main-app run test:integration",
+    "test:e2e": "npm --workspace apps/main-app run test:e2e",
+    "build": "npm --workspace apps/main-app run build",
+    "tauri:build": "npm --workspace apps/main-app run tauri:build"
+  }
+}
+

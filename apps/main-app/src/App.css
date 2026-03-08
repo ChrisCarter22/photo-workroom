@@ -1,0 +1,241 @@
+:root {
+  --shell-ink: #ebece7;
+  --shell-ink-muted: #a8afa3;
+  --shell-panel: rgba(13, 19, 17, 0.88);
+  --shell-panel-strong: rgba(17, 26, 23, 0.96);
+  --shell-border: rgba(214, 224, 206, 0.11);
+  --shell-accent: #d5a85f;
+  --shell-accent-soft: rgba(213, 168, 95, 0.16);
+  --shell-shadow: 0 24px 60px rgba(4, 7, 6, 0.42);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: minmax(18rem, 22rem) 1fr;
+  min-height: 100vh;
+  color: var(--shell-ink);
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: linear-gradient(180deg, rgba(18, 24, 23, 0.96), rgba(9, 13, 12, 0.98));
+  border-right: 1px solid var(--shell-border);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.03);
+}
+
+.brand-block,
+.panel,
+.workspace-card,
+.health-card,
+.surface {
+  background: var(--shell-panel);
+  border: 1px solid var(--shell-border);
+  border-radius: 1rem;
+  box-shadow: var(--shell-shadow);
+}
+
+.brand-block,
+.panel {
+  padding: 1rem;
+}
+
+.workspace {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-width: 0;
+  background:
+    radial-gradient(circle at top left, rgba(213, 168, 95, 0.2), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(73, 111, 136, 0.16), transparent 34%),
+    linear-gradient(180deg, #090d0d, #101715);
+}
+
+.tab-strip {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1.2rem 1.5rem 0;
+  overflow-x: auto;
+}
+
+.tab {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.72rem 1rem;
+  color: var(--shell-ink-muted);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.tab-active {
+  color: var(--shell-ink);
+  border-color: rgba(213, 168, 95, 0.45);
+  background: linear-gradient(135deg, rgba(213, 168, 95, 0.2), rgba(88, 118, 143, 0.16));
+}
+
+.workspace-canvas {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 24rem);
+  gap: 1rem;
+  padding: 1.2rem 1.5rem 1rem;
+}
+
+.workspace-card,
+.health-card {
+  padding: 1.2rem;
+}
+
+.workspace-heading,
+.panel-header,
+.health-metadata,
+.status-bar,
+.button-row,
+.badge-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.workspace-heading {
+  align-items: flex-start;
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: var(--shell-accent);
+}
+
+.lede,
+.caption,
+.workspace-copy,
+.panel-list,
+.surface p,
+.health-placeholder,
+.health-message,
+.health-section p {
+  color: var(--shell-ink-muted);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.panel-input {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.85rem;
+  padding: 0.78rem 0.9rem;
+  background: rgba(0, 0, 0, 0.22);
+  color: var(--shell-ink);
+}
+
+.button-row {
+  justify-content: flex-start;
+}
+
+.primary-button,
+.secondary-button {
+  border-radius: 999px;
+  padding: 0.78rem 1rem;
+  font-size: 0.94rem;
+}
+
+.primary-button {
+  background: linear-gradient(135deg, #d5a85f, #8ca4bc);
+  color: #101412;
+}
+
+.secondary-button {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--shell-ink);
+}
+
+.panel-list,
+.health-section ul {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding-left: 1rem;
+}
+
+.workspace-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 1.25rem;
+}
+
+.surface {
+  padding: 1rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.35rem 0.65rem;
+  background: var(--shell-accent-soft);
+  color: var(--shell-accent);
+  font-size: 0.8rem;
+}
+
+.health-card {
+  background: var(--shell-panel-strong);
+}
+
+.health-section ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.health-section li {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 0.35rem 0.75rem;
+  padding: 0.85rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.health-section li:first-child {
+  border-top: 0;
+}
+
+.health-section p {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.error-text {
+  color: #ffae9a;
+}
+
+.status-bar {
+  padding: 0.9rem 1.5rem 1.2rem;
+  color: var(--shell-ink-muted);
+  font-size: 0.88rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+@media (max-width: 1080px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace-canvas {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+}
