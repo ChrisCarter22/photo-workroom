@@ -7,7 +7,7 @@ Current repository status on March 8, 2026:
 - the repository now contains a real workspace scaffold with `apps/`, `crates/`, `tests/`, `benchmarks/`, `scripts/`, `packages/`, and `.github/`
 - the desktop shell baseline exists under `apps/main-app/` with typed Tauri health-check and separate-window folder-open flows
 - a deterministic Tauri launch smoke command now exists at `npm run test:tauri-launch`
-- cross-platform bootstrap validation automation now exists at `.github/workflows/bootstrap-validation.yml`
+- cross-platform bootstrap validation automation now exists at `.github/workflows/bootstrap-validation.yml`, with a fully green Ubuntu, macOS, and Windows run recorded on March 8, 2026 (`run 22816838497`)
 - bootstrap verification evidence is tracked in `tests/validation/BOOTSTRAP_VALIDATION.md`
 - metadata reference fixtures have been promoted into `tests/fixtures/metadata/`
 - the repository does contain `examples/XMP Side Car.XMP`, which should be treated as the first metadata sidecar reference input
@@ -62,7 +62,7 @@ Current exclusion:
 | Phase | Status | Summary |
 |---|---|---|
 | Phase 0: Repository bootstrap | `[x]` | Workspace scaffold, manifests, fixture promotion, scripts, and verification entrypoints now exist and verify cleanly |
-| Phase 1: Dev environment hardening | `[-]` | Toolchain docs, setup notes, templates, and bootstrap automation exist, with Linux and Windows evidence pending first CI matrix run |
+| Phase 1: Dev environment hardening | `[x]` | Toolchain docs, setup notes, templates, and bootstrap automation now verify cleanly on Ubuntu, macOS, and Windows |
 | Phase 2: Shell app bootstrap | `[x]` | The shell app now supports typed IPC health-check, explicit separate-window behavior, and deterministic local launch-smoke verification |
 | Phase 3: Local database and indexing foundation | `[ ]` | No schema, migrations, or DB layer exist yet |
 | Phase 4: Filesystem scanning foundation | `[ ]` | No scan pipeline exists yet |
@@ -78,7 +78,7 @@ Current exclusion:
 | Phase 14: Reliability pass | `[ ]` | No edge-case verification exists yet |
 | Phase 15: Documentation pass | `[-]` | Core docs exist and were expanded, but implementation-linked docs will need revision once code lands |
 | Phase 16: CI hardening | `[-]` | A narrow bootstrap validation matrix workflow now exists; broader CI hardening and release automation remain pending |
-| Phase 17: Cross-platform validation | `[ ]` | No builds or validation runs exist yet |
+| Phase 17: Cross-platform validation | `[ ]` | Bootstrap-level cross-platform validation runs exist; full phase scope remains pending |
 | Phase 18: Beta readiness | `[ ]` | Product validation not started |
 | Phase 19: Stable release readiness | `[ ]` | Release engineering not started |
 | Phase 20: Post-release operations | `[ ]` | Post-release cadence not applicable yet |
@@ -171,7 +171,7 @@ Exit criteria:
 - contributors can install the workspace cleanly
 - baseline scripts run successfully
 
-## Phase 1: Dev environment hardening `[-]`
+## Phase 1: Dev environment hardening `[x]`
 
 Goal:
 
@@ -191,12 +191,12 @@ Checklist:
   - `[x]` add setup instructions for Windows
   - `[x]` add editor recommendations and extensions
   - `[x]` add troubleshooting notes for common setup failures
-- `[-]` Local validation
-  - `[-]` verify `npm ci` installs on all supported platforms
+- `[x]` Local validation
+  - `[x]` verify `npm ci` installs on all supported platforms
   - `[x]` verify Rust format and lint flows
   - `[x]` verify frontend lint and typecheck flows
   - `[x]` verify app launch smoke from a local machine with `npm run test:tauri-launch`
-  - `[-]` verify clean bootstrap from an empty machine
+  - `[x]` verify clean bootstrap from an empty machine
   - `[x]` add cross-platform bootstrap workflow and evidence log
 - `[x]` Templates and guardrails
   - `[x]` add issue templates
