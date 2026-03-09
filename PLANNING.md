@@ -7,6 +7,7 @@ Current repository status on March 9, 2026:
 - the repository now contains a real workspace scaffold with `apps/`, `crates/`, `tests/`, `benchmarks/`, `scripts/`, `packages/`, and `.github/`
 - the desktop shell baseline exists under `apps/main-app/` with typed Tauri health-check and separate-window folder-open flows
 - a Phase 3 local DB foundation now exists in `crates/db` with `rusqlite`, SQL migrations, WAL defaults, and typed asset repository helpers
+- a Phase 3 task-runtime baseline now exists in `crates/task_runtime` with explicit helper-queue priorities plus cancellation and retry state transitions
 - a deterministic Tauri launch smoke command now exists at `npm run test:tauri-launch`
 - cross-platform bootstrap validation automation now exists at `.github/workflows/bootstrap-validation.yml`, with a fully green Ubuntu, macOS, and Windows run recorded on March 8, 2026 (`run 22816838497`)
 - bootstrap verification evidence is tracked in `tests/validation/BOOTSTRAP_VALIDATION.md`
@@ -65,7 +66,7 @@ Current exclusion:
 | Phase 0: Repository bootstrap | `[x]` | Workspace scaffold, manifests, fixture promotion, scripts, and verification entrypoints now exist and verify cleanly |
 | Phase 1: Dev environment hardening | `[x]` | Toolchain docs, setup notes, templates, and bootstrap automation now verify cleanly on Ubuntu, macOS, and Windows |
 | Phase 2: Shell app bootstrap | `[x]` | The shell app now supports typed IPC health-check, explicit separate-window behavior, and deterministic local launch-smoke verification |
-| Phase 3: Local database and indexing foundation | `[-]` | SQLite access, migration bootstrap, startup initialization, and typed asset CRUD baseline now exist; task-runtime integration remains pending |
+| Phase 3: Local database and indexing foundation | `[x]` | SQLite access, migration bootstrap, startup initialization, typed asset CRUD, and task-runtime queue plus state baseline now exist and verify |
 | Phase 4: Filesystem scanning foundation | `[ ]` | No scan pipeline exists yet |
 | Phase 5: Ingest MVP | `[ ]` | No ingest implementation exists yet |
 | Phase 6: Fast browser and contact sheet MVP | `[ ]` | No UI implementation exists yet |
@@ -246,7 +247,7 @@ Exit criteria:
 
 - the app boots, renders a real window, and passes the baseline checks
 
-## Phase 3: Local database and indexing foundation `[-]`
+## Phase 3: Local database and indexing foundation `[x]`
 
 Goal:
 
@@ -274,16 +275,16 @@ Checklist:
   - `[x]` run migrations automatically
   - `[x]` enable WAL mode
   - `[x]` expose a typed repository layer
-- `[ ]` Task runtime baseline
-  - `[ ]` define task coordinator responsibilities
-  - `[ ]` define helper queue types for ingest, preview, metadata, rename, and delivery
-  - `[ ]` define task priority rules for interactive browsing versus background jobs
-  - `[ ]` define cancellation and retry state model
-- `[-]` Verification
+- `[x]` Task runtime baseline
+  - `[x]` define task coordinator responsibilities
+  - `[x]` define helper queue types for ingest, preview, metadata, rename, and delivery
+  - `[x]` define task priority rules for interactive browsing versus background jobs
+  - `[x]` define cancellation and retry state model
+- `[x]` Verification
   - `[x]` unit test basic CRUD
   - `[x]` test migration application from a fresh DB
   - `[x]` test migration application from an older schema version
-  - `[ ]` test task-state persistence or publication rules
+  - `[x]` test task-state persistence or publication rules
 
 Exit criteria:
 

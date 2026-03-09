@@ -7,6 +7,7 @@ Current repository status on March 9, 2026:
 - the repository now contains application code under `apps/main-app/` and Rust workspace crates under `crates/`
 - app-local Vitest coverage exists for unit, integration, and shell smoke flows
 - `crates/db` now includes Rust unit coverage for fresh migration bootstrap, upgrade migration application, and typed CRUD behavior
+- `crates/task_runtime` now includes Rust unit coverage for helper-queue publication and cancellation/retry state-transition rules
 - metadata reference files have been promoted into `tests/fixtures/metadata/`
 - a cross-platform bootstrap validation workflow now exists at `.github/workflows/bootstrap-validation.yml`
 - the repository now includes `examples/XMP Side Car.XMP` as a seed XMP sidecar reference file
