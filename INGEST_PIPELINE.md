@@ -2,10 +2,10 @@
 
 This document defines the target ingest pipeline for Photo Workroom.
 
-Current repository status on March 8, 2026:
+Current repository status on March 9, 2026:
 
-- no ingest code exists yet
-- the workflow below is the design target for Phases 4 and 5
+- `crates/ingest` now includes a Phase 4 filesystem scan baseline with recursive traversal, hidden or excluded policy handling, media classification, RAW/JPEG pairing, XMP sidecar linking, metadata-queue planning, and cancellation-aware progress callbacks
+- transfer execution, ingest-session persistence, and recovery behavior remain target-state work for Phase 5
 
 ## Goals
 

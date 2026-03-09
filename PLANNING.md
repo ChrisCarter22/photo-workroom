@@ -8,6 +8,7 @@ Current repository status on March 9, 2026:
 - the desktop shell baseline exists under `apps/main-app/` with typed Tauri health-check and separate-window folder-open flows
 - a Phase 3 local DB foundation now exists in `crates/db` with `rusqlite`, SQL migrations, WAL defaults, and typed asset repository helpers
 - a Phase 3 task-runtime baseline now exists in `crates/task_runtime` with explicit helper-queue priorities plus cancellation and retry state transitions
+- a Phase 4 scan baseline now exists in `crates/ingest` for recursive folder scanning, media classification, RAW/JPEG pairing, sidecar linking, metadata-queue planning, and cancellation-aware progress publication
 - a deterministic Tauri launch smoke command now exists at `npm run test:tauri-launch`
 - cross-platform bootstrap validation automation now exists at `.github/workflows/bootstrap-validation.yml`, with a fully green Ubuntu, macOS, and Windows run recorded on March 8, 2026 (`run 22816838497`)
 - bootstrap verification evidence is tracked in `tests/validation/BOOTSTRAP_VALIDATION.md`
@@ -67,7 +68,7 @@ Current exclusion:
 | Phase 1: Dev environment hardening | `[x]` | Toolchain docs, setup notes, templates, and bootstrap automation now verify cleanly on Ubuntu, macOS, and Windows |
 | Phase 2: Shell app bootstrap | `[x]` | The shell app now supports typed IPC health-check, explicit separate-window behavior, and deterministic local launch-smoke verification |
 | Phase 3: Local database and indexing foundation | `[x]` | SQLite access, migration bootstrap, startup initialization, typed asset CRUD, and task-runtime queue plus state baseline now exist and verify |
-| Phase 4: Filesystem scanning foundation | `[ ]` | No scan pipeline exists yet |
+| Phase 4: Filesystem scanning foundation | `[-]` | Recursive scanning, classification, pairing, sidecar detection, and scan progress plus cancellation baseline now exist; DB persistence and benchmark coverage remain pending |
 | Phase 5: Ingest MVP | `[ ]` | No ingest implementation exists yet |
 | Phase 6: Fast browser and contact sheet MVP | `[ ]` | No UI implementation exists yet |
 | Phase 7: Preview pipeline MVP | `[ ]` | No preview pipeline exists yet |
@@ -290,7 +291,7 @@ Exit criteria:
 
 - the application creates and migrates a local DB successfully and tests validate the repository layer
 
-## Phase 4: Filesystem scanning foundation `[ ]`
+## Phase 4: Filesystem scanning foundation `[-]`
 
 Goal:
 
@@ -298,24 +299,24 @@ Goal:
 
 Checklist:
 
-- `[ ]` Scanner behavior
-  - `[ ]` accept a user-selected root path
-  - `[ ]` recurse directories safely
-  - `[ ]` skip hidden or excluded files according to policy
-  - `[ ]` detect supported media types
-  - `[ ]` normalize and persist canonical paths
-- `[ ]` Asset classification
-  - `[ ]` detect RAW plus JPEG pairs
-  - `[ ]` detect XMP sidecars
-  - `[ ]` collect file stats needed for change detection
-  - `[ ]` queue metadata extraction
-- `[ ]` Progress and control
-  - `[ ]` emit progress updates
-  - `[ ]` support cancellation
+- `[x]` Scanner behavior
+  - `[x]` accept a user-selected root path
+  - `[x]` recurse directories safely
+  - `[x]` skip hidden or excluded files according to policy
+  - `[x]` detect supported media types
+  - `[x]` normalize and persist canonical paths
+- `[x]` Asset classification
+  - `[x]` detect RAW plus JPEG pairs
+  - `[x]` detect XMP sidecars
+  - `[x]` collect file stats needed for change detection
+  - `[x]` queue metadata extraction
+- `[-]` Progress and control
+  - `[x]` emit progress updates
+  - `[x]` support cancellation
   - `[ ]` record scan results in audit history
-- `[ ]` Verification
-  - `[ ]` unit test scanning with fixture folders
-  - `[ ]` test duplicate or collision handling
+- `[-]` Verification
+  - `[x]` unit test scanning with fixture folders
+  - `[x]` test duplicate or collision handling
   - `[ ]` benchmark large-folder scan behavior
 
 Exit criteria:
