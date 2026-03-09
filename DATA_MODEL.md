@@ -2,10 +2,10 @@
 
 This document defines the target data model for Photo Workroom.
 
-Current repository status on March 8, 2026:
+Current repository status on March 9, 2026:
 
-- no database schema or migrations exist yet
-- the structures below describe the intended model for Phase 3 and beyond
+- a Phase 3 baseline now exists in `crates/db` with incremental SQL migrations and startup initialization
+- only a foundational subset of the target model is implemented; the structures below still describe the broader target beyond the current baseline
 
 ## Data model goals
 

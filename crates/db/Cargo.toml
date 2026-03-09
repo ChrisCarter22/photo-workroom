@@ -5,3 +5,4 @@ edition.workspace = true
 
 [dependencies]
 photo_workroom_core = { path = "../core" }
+rusqlite.workspace = true

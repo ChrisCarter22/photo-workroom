@@ -2,7 +2,7 @@
 
 This document describes the target repository layout and the meaning of each top-level area.
 
-Current repository status on March 8, 2026:
+Current repository status on March 9, 2026:
 
 - the repository now contains a real workspace scaffold
 - the top-level directories described below reflect the current tree, not just the intended target
@@ -16,6 +16,7 @@ Present today:
 - root workspace manifests including `package.json`, `package-lock.json`, `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml`, `tsconfig.base.json`, and `eslint.config.js`
 - `apps/main-app/` with renderer and Tauri shell code
 - `crates/` with initial Rust subsystem boundaries
+- `crates/db/migrations/` with the first SQLite migration files for Phase 3 bootstrap
 - `tests/fixtures/metadata/` with promoted reference fixtures
 - placeholder `packages/` and `benchmarks/` directories with checked-in README files
 - `scripts/tauri-launch-smoke.mjs` for deterministic desktop launch verification
@@ -99,6 +100,8 @@ Present supporting sample data today:
 ## Workspace notes
 
 - `apps/main-app/src-tauri/icons/icon.png` is currently a placeholder application icon for the bootstrap milestone
+- `apps/main-app/src-tauri/icons/icon.ico` now exists to satisfy Windows Tauri resource builds
+- `crates/db/src/lib.rs` now contains the local DB bootstrap boundary with startup migration and typed asset repository helpers
 - app-local frontend tests live under `apps/main-app/src/` while root `tests/` currently holds shared fixtures and validation evidence logs
 - generated runtime artifacts such as `node_modules/`, `target/`, `dist/`, and Tauri schema output are ignored and do not define the repository structure
 

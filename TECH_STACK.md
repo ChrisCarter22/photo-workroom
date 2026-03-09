@@ -2,11 +2,12 @@
 
 This document defines the preferred technology baseline for Photo Workroom.
 
-Current repository status on March 8, 2026:
+Current repository status on March 9, 2026:
 
 - the workspace is now scaffolded with npm workspaces, a Rust workspace, and a Tauri v2 plus React plus TypeScript plus Vite shell app
 - exact installed JS versions are pinned in `package-lock.json` and the current Rust crate graph is pinned in `Cargo.lock`
-- Playwright, SQLite access, and metadata-library integration are still planned beyond the bootstrap shell
+- a Phase 3 baseline now exists in `crates/db` using `rusqlite` plus SQL-file migrations with `PRAGMA user_version`
+- Playwright and metadata-library integration are still planned beyond the bootstrap shell
 - any deviation from these defaults must be recorded in `DECISIONS.md`
 
 ## Decision summary
@@ -133,15 +134,16 @@ Rejected defaults:
 
 ### `sqlx` vs `rusqlite`
 
-Current direction:
+Current implemented baseline:
 
-- default to `sqlx` if async access and typed migration workflows become central
-- default to `rusqlite` if the implementation stays sync-first with a narrowly controlled DB layer
+- `rusqlite` is the active DB layer for the current sync-first Phase 3 foundation
+- migrations are SQL files applied in order via `PRAGMA user_version`
+- decision recorded in `DECISIONS.md` ADR-009
 
-Decision rule:
+Future decision rule:
 
-- pick one primary access layer and document it in `DECISIONS.md`
-- do not keep both unless there is a clear, justified split of responsibilities
+- introduce `sqlx` only if async DB orchestration becomes necessary and the change is justified in a new ADR
+- do not run both layers in parallel without a clearly documented responsibility split
 
 ## UI stack
 

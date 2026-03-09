@@ -2,7 +2,7 @@
 
 This file records ADR-style architectural and process decisions for Photo Workroom.
 
-Current repository status on March 8, 2026:
+Current repository status on March 9, 2026:
 
 - the entries below are accepted planning baselines
 - when implementation work proves a different direction is necessary, add a new ADR instead of silently rewriting history
@@ -209,3 +209,36 @@ Consequences:
 - source-of-truth docs, verification commands, and CI examples should use `npm` and not `pnpm`
 - dependency policy should prefer `npm ci` for clean installs and `npm install ... --save-exact` for justified additions
 - historical research notes that mention `pnpm` should be treated as superseded by the current planning baseline
+
+## ADR-009: SQLite access layer and migration baseline
+
+Date:
+
+- 2026-03-09
+
+Status:
+
+- Accepted and implemented
+
+Context:
+
+- Phase 3 requires a concrete local DB foundation with deterministic startup behavior across Linux, macOS, and Windows
+- the project needed one primary SQLite layer and a migration workflow that avoids hidden runtime drift
+
+Decision:
+
+- use `rusqlite` as the single SQLite access layer baseline for the current sync-first architecture
+- store incremental SQL migrations in `crates/db/migrations/` and apply them in order using `PRAGMA user_version`
+- initialize the catalog DB on desktop startup from the Tauri app-data directory with a stable path strategy:
+  - `<app_data_dir>/catalog/photo-workroom.sqlite3`
+- set SQLite defaults during initialization:
+  - `PRAGMA foreign_keys = ON`
+  - `PRAGMA journal_mode = WAL`
+  - `PRAGMA synchronous = NORMAL`
+
+Consequences:
+
+- `crates/db` now owns migration and repository bootstrap logic instead of scattering DB setup in app code
+- schema changes must ship as a new numbered SQL migration
+- migration tests must cover fresh bootstrap and upgrade-from-older-schema behavior
+- if async DB access becomes necessary later, a new ADR is required before introducing another access layer

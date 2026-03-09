@@ -2,10 +2,11 @@
 
 This document is the execution tracker for Photo Workroom. It converts the research plan into a phase-based program with explicit completion markers.
 
-Current repository status on March 8, 2026:
+Current repository status on March 9, 2026:
 
 - the repository now contains a real workspace scaffold with `apps/`, `crates/`, `tests/`, `benchmarks/`, `scripts/`, `packages/`, and `.github/`
 - the desktop shell baseline exists under `apps/main-app/` with typed Tauri health-check and separate-window folder-open flows
+- a Phase 3 local DB foundation now exists in `crates/db` with `rusqlite`, SQL migrations, WAL defaults, and typed asset repository helpers
 - a deterministic Tauri launch smoke command now exists at `npm run test:tauri-launch`
 - cross-platform bootstrap validation automation now exists at `.github/workflows/bootstrap-validation.yml`, with a fully green Ubuntu, macOS, and Windows run recorded on March 8, 2026 (`run 22816838497`)
 - bootstrap verification evidence is tracked in `tests/validation/BOOTSTRAP_VALIDATION.md`
@@ -64,7 +65,7 @@ Current exclusion:
 | Phase 0: Repository bootstrap | `[x]` | Workspace scaffold, manifests, fixture promotion, scripts, and verification entrypoints now exist and verify cleanly |
 | Phase 1: Dev environment hardening | `[x]` | Toolchain docs, setup notes, templates, and bootstrap automation now verify cleanly on Ubuntu, macOS, and Windows |
 | Phase 2: Shell app bootstrap | `[x]` | The shell app now supports typed IPC health-check, explicit separate-window behavior, and deterministic local launch-smoke verification |
-| Phase 3: Local database and indexing foundation | `[ ]` | No schema, migrations, or DB layer exist yet |
+| Phase 3: Local database and indexing foundation | `[-]` | SQLite access, migration bootstrap, startup initialization, and typed asset CRUD baseline now exist; task-runtime integration remains pending |
 | Phase 4: Filesystem scanning foundation | `[ ]` | No scan pipeline exists yet |
 | Phase 5: Ingest MVP | `[ ]` | No ingest implementation exists yet |
 | Phase 6: Fast browser and contact sheet MVP | `[ ]` | No UI implementation exists yet |
@@ -245,7 +246,7 @@ Exit criteria:
 
 - the app boots, renders a real window, and passes the baseline checks
 
-## Phase 3: Local database and indexing foundation `[ ]`
+## Phase 3: Local database and indexing foundation `[-]`
 
 Goal:
 
@@ -253,35 +254,35 @@ Goal:
 
 Checklist:
 
-- `[ ]` Database strategy
-  - `[ ]` choose the primary SQLite access layer
-  - `[ ]` record the DB access decision in `DECISIONS.md`
-  - `[ ]` define migration workflow
-  - `[ ]` define database location strategy per OS
-- `[ ]` Initial schema
-  - `[ ]` create `assets` table
-  - `[ ]` create variant or pairing tables
-  - `[ ]` create tags and join tables
-  - `[ ]` create keyword vocabulary tables
-  - `[ ]` create ingest session tables
-  - `[ ]` create task history tables
-  - `[ ]` create favorite folder or workset tables if the feature is persisted
-  - `[ ]` create audit log tables
-  - `[ ]` create preview cache reference tables if needed
-- `[ ]` Initialization flow
-  - `[ ]` initialize DB on app startup
-  - `[ ]` run migrations automatically
-  - `[ ]` enable WAL mode
-  - `[ ]` expose a typed repository layer
+- `[x]` Database strategy
+  - `[x]` choose the primary SQLite access layer
+  - `[x]` record the DB access decision in `DECISIONS.md`
+  - `[x]` define migration workflow
+  - `[x]` define database location strategy per OS
+- `[x]` Initial schema
+  - `[x]` create `assets` table
+  - `[x]` create variant or pairing tables
+  - `[x]` create tags and join tables
+  - `[x]` create keyword vocabulary tables
+  - `[x]` create ingest session tables
+  - `[x]` create task history tables
+  - `[x]` create favorite folder or workset tables if the feature is persisted
+  - `[x]` create audit log tables
+  - `[x]` create preview cache reference tables if needed
+- `[x]` Initialization flow
+  - `[x]` initialize DB on app startup
+  - `[x]` run migrations automatically
+  - `[x]` enable WAL mode
+  - `[x]` expose a typed repository layer
 - `[ ]` Task runtime baseline
   - `[ ]` define task coordinator responsibilities
   - `[ ]` define helper queue types for ingest, preview, metadata, rename, and delivery
   - `[ ]` define task priority rules for interactive browsing versus background jobs
   - `[ ]` define cancellation and retry state model
-- `[ ]` Verification
-  - `[ ]` unit test basic CRUD
-  - `[ ]` test migration application from a fresh DB
-  - `[ ]` test migration application from an older schema version
+- `[-]` Verification
+  - `[x]` unit test basic CRUD
+  - `[x]` test migration application from a fresh DB
+  - `[x]` test migration application from an older schema version
   - `[ ]` test task-state persistence or publication rules
 
 Exit criteria:

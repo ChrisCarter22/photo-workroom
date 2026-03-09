@@ -171,6 +171,31 @@ pub fn run() {
     tracing::info!("starting Photo Workroom desktop shell");
 
     tauri::Builder::default()
+        .setup(|app| {
+            let app_data_dir = app.path().app_data_dir().map_err(|error| {
+                std::io::Error::other(format!(
+                    "failed to resolve app data directory for catalog database: {error}"
+                ))
+            })?;
+            let database =
+                photo_workroom_db::open_catalog_database(&app_data_dir).map_err(|error| {
+                    std::io::Error::other(format!(
+                        "failed to initialize local catalog database: {error}"
+                    ))
+                })?;
+            let schema_version = database.schema_version().map_err(|error| {
+                std::io::Error::other(format!(
+                    "failed to read catalog schema version after initialization: {error}"
+                ))
+            })?;
+
+            tracing::info!(
+                db_path = %database.database_path().display(),
+                schema_version,
+                "initialized local catalog database"
+            );
+            Ok(())
+        })
         .manage(PendingWindowFolderOpenRequests::default())
         .invoke_handler(tauri::generate_handler![
             health_check,
