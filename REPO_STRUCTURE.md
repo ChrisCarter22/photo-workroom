@@ -103,7 +103,7 @@ Present supporting sample data today:
 - `apps/main-app/src-tauri/icons/icon.ico` now exists to satisfy Windows Tauri resource builds
 - `crates/db/src/lib.rs` now contains the local DB bootstrap boundary with startup migration and typed asset repository helpers
 - `crates/task_runtime/src/lib.rs` now contains queue publication and task-state transition baseline rules for helper orchestration
-- `crates/ingest/src/lib.rs` now contains a Phase 4 filesystem scan baseline with recursive traversal, classification, pairing, sidecar linking, and cancellation-aware progress updates
+- `crates/ingest/src/lib.rs` now contains a Phase 4 filesystem scan baseline with recursive traversal, classification, pairing, sidecar linking, cancellation-aware progress updates, DB persistence helpers, and a manual large-folder benchmark harness
 - app-local frontend tests live under `apps/main-app/src/` while root `tests/` currently holds shared fixtures and validation evidence logs
 - generated runtime artifacts such as `node_modules/`, `target/`, `dist/`, and Tauri schema output are ignored and do not define the repository structure
 

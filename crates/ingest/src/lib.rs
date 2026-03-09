@@ -11,6 +11,7 @@ use std::{
 };
 
 use photo_workroom_core::SubsystemSnapshot;
+use photo_workroom_db::{CatalogDatabase, DbError, NewAssetRecord};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MediaType {
@@ -137,6 +138,43 @@ pub struct ScanResult {
     pub progress: ScanProgress,
 }
 
+pub const SCAN_RESULT_AUDIT_EVENT_TYPE: &str = "scan_result";
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PersistedScanSummary {
+    pub upserted_assets: u64,
+    pub audit_event_id: i64,
+}
+
+#[derive(Debug)]
+pub enum ScanPersistenceError {
+    Database(DbError),
+}
+
+impl Display for ScanPersistenceError {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Database(error) => {
+                write!(formatter, "database error while persisting scan: {error}")
+            }
+        }
+    }
+}
+
+impl std::error::Error for ScanPersistenceError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Database(error) => Some(error),
+        }
+    }
+}
+
+impl From<DbError> for ScanPersistenceError {
+    fn from(error: DbError) -> Self {
+        Self::Database(error)
+    }
+}
+
 #[derive(Debug, Default)]
 struct PairBucket {
     raw_paths: Vec<String>,
@@ -164,6 +202,35 @@ pub fn scan_folder_with_options(
     options: &ScanOptions,
 ) -> Result<ScanResult, ScanError> {
     scan_folder_with_progress(root, options, |_| {})
+}
+
+pub fn persist_scan_result(
+    database: &CatalogDatabase,
+    scan_result: &ScanResult,
+) -> Result<PersistedScanSummary, ScanPersistenceError> {
+    for asset in &scan_result.assets {
+        database.upsert_asset(NewAssetRecord::new(
+            asset.canonical_path.clone(),
+            asset.file_size_bytes,
+        ))?;
+    }
+
+    let details = format!(
+        "root_path={}; assets={}; sidecars={}; pairs={}; metadata_jobs={}; warnings={}; files_scanned={}",
+        scan_result.root_path,
+        scan_result.assets.len(),
+        scan_result.sidecar_links.len(),
+        scan_result.raw_jpeg_pairs.len(),
+        scan_result.metadata_jobs.len(),
+        scan_result.warnings.len(),
+        scan_result.progress.files_scanned
+    );
+    let audit_event = database.append_audit_event(SCAN_RESULT_AUDIT_EVENT_TYPE, &details)?;
+
+    Ok(PersistedScanSummary {
+        upserted_assets: scan_result.assets.len() as u64,
+        audit_event_id: audit_event.id,
+    })
 }
 
 pub fn scan_folder_with_progress<F>(
@@ -512,10 +579,11 @@ mod tests {
         env, fs,
         path::{Path, PathBuf},
         process,
-        time::{SystemTime, UNIX_EPOCH},
+        time::{Instant, SystemTime, UNIX_EPOCH},
     };
 
     use super::*;
+    use photo_workroom_db::open_catalog_database;
 
     struct TempDirectory {
         path: PathBuf,
@@ -631,6 +699,49 @@ mod tests {
     }
 
     #[test]
+    fn persists_scan_results_into_catalog_and_audit_history() {
+        let scan_fixture = TempDirectory::create("scan-persist-fixture");
+        let root = scan_fixture.path().join("root");
+        fs::create_dir_all(&root).expect("root folder should be created");
+        fs::write(root.join("day-001.CR3"), b"raw").expect("raw file should be written");
+        fs::write(root.join("day-001.JPG"), b"jpeg").expect("jpeg file should be written");
+        fs::write(root.join("day-001.XMP"), b"xmp").expect("xmp file should be written");
+        fs::write(root.join("README.txt"), b"note").expect("unsupported file should be written");
+
+        let scan_result = scan_folder(&root).expect("scan should succeed");
+        assert_eq!(scan_result.assets.len(), 2);
+
+        let app_data_dir = TempDirectory::create("scan-persist-db");
+        let database =
+            open_catalog_database(app_data_dir.path()).expect("catalog database should initialize");
+
+        let first = persist_scan_result(&database, &scan_result)
+            .expect("scan result should persist into catalog");
+        let second =
+            persist_scan_result(&database, &scan_result).expect("scan result should be repeatable");
+
+        assert_eq!(first.upserted_assets, 2);
+        assert_eq!(second.upserted_assets, 2);
+        assert!(second.audit_event_id > first.audit_event_id);
+        assert_eq!(database.asset_count().expect("asset count should query"), 2);
+        assert_eq!(
+            database
+                .audit_event_count()
+                .expect("audit event count should query"),
+            2
+        );
+
+        let latest_audit = database
+            .latest_audit_event()
+            .expect("latest audit event should query")
+            .expect("latest audit event should exist");
+        assert_eq!(latest_audit.event_type, SCAN_RESULT_AUDIT_EVENT_TYPE);
+        assert!(latest_audit.details.contains("assets=2"));
+        assert!(latest_audit.details.contains("sidecars=1"));
+        assert!(latest_audit.details.contains("pairs=1"));
+    }
+
+    #[test]
     fn supports_cancellation_and_progress_callbacks() {
         let temp_dir = TempDirectory::create("scan-cancel");
         let root = temp_dir.path().join("root");
@@ -658,5 +769,56 @@ mod tests {
 
         assert!(matches!(scan_result, Err(ScanError::Cancelled)));
         assert!(callback_count >= 1);
+    }
+
+    #[test]
+    #[ignore = "benchmark harness for large-folder scan behavior"]
+    fn benchmark_large_folder_scan_behavior() {
+        let fixture = TempDirectory::create("scan-benchmark");
+        let root = fixture.path().join("root");
+        fs::create_dir_all(&root).expect("root folder should be created");
+
+        let mut expected_assets = 0_u64;
+        let mut expected_sidecars = 0_u64;
+        for day in 0..24_u32 {
+            let day_folder = root.join(format!("day-{day:03}"));
+            fs::create_dir_all(&day_folder).expect("day folder should be created");
+
+            for frame in 0..90_u32 {
+                let stem = format!("IMG_{day:03}_{frame:04}");
+                fs::write(day_folder.join(format!("{stem}.CR3")), b"raw")
+                    .expect("raw file should be written");
+                expected_assets += 1;
+
+                if frame % 2 == 0 {
+                    fs::write(day_folder.join(format!("{stem}.JPG")), b"jpeg")
+                        .expect("jpeg file should be written");
+                    expected_assets += 1;
+                }
+
+                if frame % 3 == 0 {
+                    fs::write(day_folder.join(format!("{stem}.XMP")), b"xmp")
+                        .expect("xmp file should be written");
+                    expected_sidecars += 1;
+                }
+            }
+        }
+
+        let started = Instant::now();
+        let scan_result = scan_folder(&root).expect("benchmark scan should succeed");
+        let elapsed = started.elapsed();
+
+        assert_eq!(scan_result.assets.len() as u64, expected_assets);
+        assert_eq!(
+            scan_result.progress.files_scanned,
+            expected_assets + expected_sidecars
+        );
+        assert_eq!(scan_result.progress.sidecars_detected, expected_sidecars);
+        println!(
+            "benchmark_large_folder_scan_behavior assets={} sidecars={} elapsed_ms={}",
+            scan_result.assets.len(),
+            scan_result.sidecar_links.len(),
+            elapsed.as_millis()
+        );
     }
 }

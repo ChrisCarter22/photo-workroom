@@ -2232,6 +2232,7 @@ name = "photo_workroom_ingest"
 version = "0.1.0"
 dependencies = [
  "photo_workroom_core",
+ "photo_workroom_db",
 ]
 
 [[package]]

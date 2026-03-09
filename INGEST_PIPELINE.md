@@ -4,8 +4,10 @@ This document defines the target ingest pipeline for Photo Workroom.
 
 Current repository status on March 9, 2026:
 
-- `crates/ingest` now includes a Phase 4 filesystem scan baseline with recursive traversal, hidden or excluded policy handling, media classification, RAW/JPEG pairing, XMP sidecar linking, metadata-queue planning, and cancellation-aware progress callbacks
-- transfer execution, ingest-session persistence, and recovery behavior remain target-state work for Phase 5
+- `crates/ingest` now includes a Phase 4 filesystem scan baseline with recursive traversal, hidden or excluded policy handling, media classification, RAW/JPEG pairing, XMP sidecar linking, metadata-queue planning, cancellation-aware progress callbacks, and DB-persistence helpers
+- scan persistence now upserts canonical assets into the local catalog and records scan summaries in `audit_log`
+- a manual large-folder scan benchmark harness now exists in `crates/ingest` as an ignored Rust test
+- transfer execution, destination-write ingest sessions, and recovery behavior remain target-state work for Phase 5
 
 ## Goals
 

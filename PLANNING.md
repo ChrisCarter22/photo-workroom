@@ -8,7 +8,7 @@ Current repository status on March 9, 2026:
 - the desktop shell baseline exists under `apps/main-app/` with typed Tauri health-check and separate-window folder-open flows
 - a Phase 3 local DB foundation now exists in `crates/db` with `rusqlite`, SQL migrations, WAL defaults, and typed asset repository helpers
 - a Phase 3 task-runtime baseline now exists in `crates/task_runtime` with explicit helper-queue priorities plus cancellation and retry state transitions
-- a Phase 4 scan baseline now exists in `crates/ingest` for recursive folder scanning, media classification, RAW/JPEG pairing, sidecar linking, metadata-queue planning, and cancellation-aware progress publication
+- a Phase 4 scan baseline now exists in `crates/ingest` for recursive folder scanning, media classification, RAW/JPEG pairing, sidecar linking, metadata-queue planning, cancellation-aware progress publication, DB asset persistence, audit-log recording, and large-folder benchmark coverage
 - a deterministic Tauri launch smoke command now exists at `npm run test:tauri-launch`
 - cross-platform bootstrap validation automation now exists at `.github/workflows/bootstrap-validation.yml`, with a fully green Ubuntu, macOS, and Windows run recorded on March 8, 2026 (`run 22816838497`)
 - bootstrap verification evidence is tracked in `tests/validation/BOOTSTRAP_VALIDATION.md`
@@ -68,7 +68,7 @@ Current exclusion:
 | Phase 1: Dev environment hardening | `[x]` | Toolchain docs, setup notes, templates, and bootstrap automation now verify cleanly on Ubuntu, macOS, and Windows |
 | Phase 2: Shell app bootstrap | `[x]` | The shell app now supports typed IPC health-check, explicit separate-window behavior, and deterministic local launch-smoke verification |
 | Phase 3: Local database and indexing foundation | `[x]` | SQLite access, migration bootstrap, startup initialization, typed asset CRUD, and task-runtime queue plus state baseline now exist and verify |
-| Phase 4: Filesystem scanning foundation | `[-]` | Recursive scanning, classification, pairing, sidecar detection, and scan progress plus cancellation baseline now exist; DB persistence and benchmark coverage remain pending |
+| Phase 4: Filesystem scanning foundation | `[x]` | Recursive scanning, classification, pairing, sidecar detection, progress and cancellation, DB persistence, audit-log recording, and large-folder benchmark coverage now exist |
 | Phase 5: Ingest MVP | `[ ]` | No ingest implementation exists yet |
 | Phase 6: Fast browser and contact sheet MVP | `[ ]` | No UI implementation exists yet |
 | Phase 7: Preview pipeline MVP | `[ ]` | No preview pipeline exists yet |
@@ -77,7 +77,7 @@ Current exclusion:
 | Phase 10: Batch rename and template MVP | `[ ]` | No rename subsystem exists yet |
 | Phase 11: Search, filter, and sort MVP | `[ ]` | No search implementation exists yet |
 | Phase 12: Export, delivery, and external handoff MVP | `[ ]` | No output, delivery, or handoff implementation exists yet |
-| Phase 13: Performance pass | `[ ]` | No benchmark harness exists yet |
+| Phase 13: Performance pass | `[ ]` | A narrow ingest scan benchmark harness now exists for Phase 4 verification, but broad performance-phase benchmarking is not started |
 | Phase 14: Reliability pass | `[ ]` | No edge-case verification exists yet |
 | Phase 15: Documentation pass | `[-]` | Core docs exist and were expanded, but implementation-linked docs will need revision once code lands |
 | Phase 16: CI hardening | `[-]` | A narrow bootstrap validation matrix workflow now exists; broader CI hardening and release automation remain pending |
@@ -291,7 +291,7 @@ Exit criteria:
 
 - the application creates and migrates a local DB successfully and tests validate the repository layer
 
-## Phase 4: Filesystem scanning foundation `[-]`
+## Phase 4: Filesystem scanning foundation `[x]`
 
 Goal:
 
@@ -310,14 +310,14 @@ Checklist:
   - `[x]` detect XMP sidecars
   - `[x]` collect file stats needed for change detection
   - `[x]` queue metadata extraction
-- `[-]` Progress and control
+- `[x]` Progress and control
   - `[x]` emit progress updates
   - `[x]` support cancellation
-  - `[ ]` record scan results in audit history
-- `[-]` Verification
+  - `[x]` record scan results in audit history
+- `[x]` Verification
   - `[x]` unit test scanning with fixture folders
   - `[x]` test duplicate or collision handling
-  - `[ ]` benchmark large-folder scan behavior
+  - `[x]` benchmark large-folder scan behavior
 
 Exit criteria:
 

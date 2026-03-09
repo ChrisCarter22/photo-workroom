@@ -92,6 +92,14 @@ pub struct AssetRecord {
     pub file_size_bytes: i64,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AuditEventRecord {
+    pub id: i64,
+    pub event_type: String,
+    pub details: String,
+    pub created_at: String,
+}
+
 #[derive(Debug)]
 pub struct CatalogDatabase {
     connection: Connection,
@@ -180,6 +188,78 @@ impl CatalogDatabase {
         u64::try_from(count).map_err(|_| DbError::Conversion("asset count was negative"))
     }
 
+    pub fn append_audit_event(
+        &self,
+        event_type: &str,
+        details: &str,
+    ) -> Result<AuditEventRecord, DbError> {
+        let event_type = normalize_event_type(event_type)?;
+        let details = normalize_event_details(details)?;
+
+        self.connection.execute(
+            "INSERT INTO audit_log (event_type, details)
+             VALUES (?1, ?2)",
+            params![event_type, details],
+        )?;
+
+        let event_id = self.connection.last_insert_rowid();
+        self.get_audit_event_by_id(event_id)?
+            .ok_or(DbError::Invariant("inserted audit event was not readable"))
+    }
+
+    pub fn audit_event_count(&self) -> Result<u64, DbError> {
+        let count: i64 =
+            self.connection
+                .query_row("SELECT COUNT(*) FROM audit_log", [], |row| row.get(0))?;
+
+        u64::try_from(count).map_err(|_| DbError::Conversion("audit event count was negative"))
+    }
+
+    pub fn latest_audit_event(&self) -> Result<Option<AuditEventRecord>, DbError> {
+        let event = self
+            .connection
+            .query_row(
+                "SELECT id, event_type, details, created_at
+                 FROM audit_log
+                 ORDER BY id DESC
+                 LIMIT 1",
+                [],
+                |row| {
+                    Ok(AuditEventRecord {
+                        id: row.get(0)?,
+                        event_type: row.get(1)?,
+                        details: row.get(2)?,
+                        created_at: row.get(3)?,
+                    })
+                },
+            )
+            .optional()?;
+
+        Ok(event)
+    }
+
+    fn get_audit_event_by_id(&self, event_id: i64) -> Result<Option<AuditEventRecord>, DbError> {
+        let event = self
+            .connection
+            .query_row(
+                "SELECT id, event_type, details, created_at
+                 FROM audit_log
+                 WHERE id = ?1",
+                params![event_id],
+                |row| {
+                    Ok(AuditEventRecord {
+                        id: row.get(0)?,
+                        event_type: row.get(1)?,
+                        details: row.get(2)?,
+                        created_at: row.get(3)?,
+                    })
+                },
+            )
+            .optional()?;
+
+        Ok(event)
+    }
+
     #[cfg(test)]
     fn table_exists(&self, table_name: &str) -> Result<bool, DbError> {
         table_exists(&self.connection, table_name)
@@ -217,6 +297,24 @@ fn normalize_path(path: &str) -> Result<&str, DbError> {
     let trimmed = path.trim();
     if trimmed.is_empty() {
         return Err(DbError::Validation("canonical_path must not be empty"));
+    }
+
+    Ok(trimmed)
+}
+
+fn normalize_event_type(event_type: &str) -> Result<&str, DbError> {
+    let trimmed = event_type.trim();
+    if trimmed.is_empty() {
+        return Err(DbError::Validation("event_type must not be empty"));
+    }
+
+    Ok(trimmed)
+}
+
+fn normalize_event_details(details: &str) -> Result<&str, DbError> {
+    let trimmed = details.trim();
+    if trimmed.is_empty() {
+        return Err(DbError::Validation("event details must not be empty"));
     }
 
     Ok(trimmed)
@@ -439,5 +537,59 @@ mod tests {
             .expect("delete should succeed");
         assert!(deleted);
         assert_eq!(database.asset_count().expect("count should succeed"), 0);
+    }
+
+    #[test]
+    fn appends_and_reads_audit_events() {
+        let app_data_dir = TempDirectory::create("audit-events");
+        let database =
+            open_catalog_database(app_data_dir.path()).expect("database should initialize");
+
+        let first = database
+            .append_audit_event("scan_result", "root_path=/photos/assets; assets=10")
+            .expect("first audit event should insert");
+        let second = database
+            .append_audit_event("scan_result", "root_path=/photos/assets; assets=12")
+            .expect("second audit event should insert");
+
+        assert_eq!(
+            database
+                .audit_event_count()
+                .expect("audit event count should be queryable"),
+            2
+        );
+        assert!(first.id < second.id);
+
+        let latest = database
+            .latest_audit_event()
+            .expect("latest audit event query should succeed")
+            .expect("latest audit event should exist");
+        assert_eq!(latest.id, second.id);
+        assert_eq!(latest.event_type, "scan_result");
+        assert!(latest.details.contains("assets=12"));
+        assert!(!latest.created_at.trim().is_empty());
+    }
+
+    #[test]
+    fn rejects_invalid_audit_event_payloads() {
+        let app_data_dir = TempDirectory::create("audit-events-invalid");
+        let database =
+            open_catalog_database(app_data_dir.path()).expect("database should initialize");
+
+        let invalid_event_type = database
+            .append_audit_event("   ", "root_path=/photos/assets; assets=10")
+            .expect_err("empty event type should fail");
+        let invalid_details = database
+            .append_audit_event("scan_result", "   ")
+            .expect_err("empty details should fail");
+
+        assert!(matches!(
+            invalid_event_type,
+            DbError::Validation("event_type must not be empty")
+        ));
+        assert!(matches!(
+            invalid_details,
+            DbError::Validation("event details must not be empty")
+        ));
     }
 }

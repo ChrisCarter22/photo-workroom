@@ -5,6 +5,7 @@ This document defines the target data model for Photo Workroom.
 Current repository status on March 9, 2026:
 
 - a Phase 3 baseline now exists in `crates/db` with incremental SQL migrations and startup initialization
+- a Phase 4 ingest persistence helper now upserts scanned canonical assets and writes scan summary events into `audit_log`
 - only a foundational subset of the target model is implemented; the structures below still describe the broader target beyond the current baseline
 
 ## Data model goals
